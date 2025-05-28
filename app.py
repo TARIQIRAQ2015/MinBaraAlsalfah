@@ -2,6 +2,102 @@ import streamlit as st
 import random
 from categories import categories  
 
+# تعيين نمط CSS مخصص
+st.markdown("""
+<style>
+    /* تخصيص الخط والألوان الرئيسية */
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;700&display=swap');
+    
+    * {
+        font-family: 'Noto Kufi Arabic', sans-serif !important;
+    }
+    
+    /* تنسيق العنوان الرئيسي */
+    h1 {
+        color: #2c3e50;
+        text-align: center;
+        padding: 20px;
+        margin-bottom: 30px;
+        background: linear-gradient(45deg, #3498db, #2ecc71);
+        border-radius: 10px;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    /* تنسيق الأزرار */
+    .stButton > button {
+        width: 100%;
+        border-radius: 20px;
+        background: linear-gradient(45deg, #3498db, #2ecc71);
+        color: white;
+        font-weight: bold;
+        border: none;
+        padding: 15px;
+        margin: 5px 0;
+        transition: all 0.3s ease;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    /* تنسيق مربعات النص */
+    .stTextInput > div > div > input {
+        border-radius: 10px;
+        border: 2px solid #3498db;
+        padding: 10px;
+    }
+    
+    /* تنسيق القوائم المنسدلة */
+    .stSelectbox > div > div > select {
+        border-radius: 10px;
+        border: 2px solid #3498db;
+    }
+    
+    /* تنسيق النص العادي */
+    p {
+        font-size: 18px;
+        color: #2c3e50;
+        line-height: 1.6;
+    }
+    
+    /* تنسيق البطاقات */
+    .card {
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin: 10px 0;
+    }
+    
+    /* تنسيق النتائج والنقاط */
+    .score {
+        font-size: 24px;
+        font-weight: bold;
+        color: #2ecc71;
+    }
+    
+    /* تنسيق التحذيرات */
+    .stAlert {
+        border-radius: 10px;
+    }
+    
+    /* تنسيق خاص للاعب برا السالفة */
+    .bara-player {
+        color: #e74c3c;
+        font-weight: bold;
+    }
+    
+    /* تنسيق خاص للكلمة السرية */
+    .secret-word {
+        color: #9b59b6;
+        font-weight: bold;
+        font-size: 20px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Initialize session state when the app starts
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
@@ -89,144 +185,296 @@ def initialize_players():
 
 # Page layouts
 def home_page():
-    st.title("لعبة براالسالفة")
-    st.write("مرحبًا بك في لعبة برا السالفة! ابدأ بتحديد عدد اللاعبين.")
-    st.session_state.num_players = st.number_input("أدخل عدد اللاعبين (3-12):", min_value=3, max_value=12, step=1)
-    st.button("ابدأ اللعبة", on_click=lambda: (initialize_players(), set_page('input_players')), key='input_players_button')
-
+    st.markdown("<h1>🎮 لعبة برا السالفة</h1>", unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="card">
+        <p style='text-align: center; font-size: 20px;'>
+            مرحباً بك في لعبة برا السالفة! 🎉<br>
+            لعبة اجتماعية ممتعة تجمع بين الذكاء والمرح
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1,2,1])
+    with col2:
+        st.number_input("👥 أدخل عدد اللاعبين (3-12):", min_value=3, max_value=12, step=1, key="num_players")
+        st.button("🎮 ابدأ اللعبة", on_click=lambda: (initialize_players(), set_page('input_players')))
 
 def input_players_page():
-    st.title("أدخل أسماء اللاعبين")
-    for i in range(st.session_state.num_players):
-        st.session_state.players[i] = st.text_input(f"اسم اللاعب رقم {i+1}:", value=st.session_state.players[i])
+    st.markdown("<h1>✍️ أدخل أسماء اللاعبين</h1>", unsafe_allow_html=True)
     
-    # make sure names above are not empty
+    col1, col2, col3 = st.columns([1,2,1])
+    with col2:
+        for i in range(st.session_state.num_players):
+            st.text_input(f"🎮 اللاعب {i+1}:", value=st.session_state.players[i], key=f"player_{i}")
+            st.session_state.players[i] = st.session_state[f"player_{i}"]
+    
     if not all(name.strip() for name in st.session_state.players):
-        st.warning("من فضلك أدخل أسماء اللاعبين")
+        st.warning("⚠️ من فضلك أدخل أسماء جميع اللاعبين")
         return
     
-    st.button("التالي", on_click=set_page, args=['select_category'], key='select_category_button')
+    col1, col2, col3 = st.columns([1,2,1])
+    with col2:
+        st.button("👉 التالي", on_click=set_page, args=['select_category'])
 
 def select_category_page():
-    st.title("اختر القائمة")
-    st.session_state.selected_category = st.selectbox("اختر قائمة الكلمات:", options=list(categories.keys()))
-    st.button("تأكيد القائمة", on_click=assign_roles_and_word, key='assign_roles_and_word_button')
+    st.markdown("<h1>📚 اختر القائمة</h1>", unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1,2,1])
+    with col2:
+        st.selectbox("🎯 اختر قائمة الكلمات:", options=list(categories.keys()), key="category_select")
+        st.session_state.selected_category = st.session_state.category_select
+        st.button("✅ تأكيد القائمة", on_click=assign_roles_and_word)
 
 def show_role_page():
-    st.title("عرض الدور")
+    st.markdown("<h1>👀 عرض الدور</h1>", unsafe_allow_html=True)
     current_player = st.session_state.players[st.session_state.current_player_index]
-    st.write(f"أعط الشاشة إلى: {current_player}")
-    st.button("عرض الدور", on_click=set_page, args=['display_role'], key='display_role_button')
+    
+    st.markdown(f"""
+    <div class="card">
+        <p style='text-align: center; font-size: 24px;'>
+            🎮 أعط الشاشة إلى: <span class='bara-player'>{current_player}</span>
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1,2,1])
+    with col2:
+        st.button("👁️ عرض الدور", on_click=set_page, args=['display_role'])
 
 def display_role_page():
     current_player = st.session_state.players[st.session_state.current_player_index]
     role = st.session_state.roles[current_player]
-    st.title("دورك")
-    st.write(f"القائمة: **{st.session_state.selected_category}**")
-    st.write(f"مرحبا {current_player}، دورك هو: **{role}**")
+    
+    st.markdown("<h1>🎭 دورك في اللعبة</h1>", unsafe_allow_html=True)
+    
+    st.markdown(f"""
+    <div class="card">
+        <p>القائمة: <span style='color: #3498db; font-weight: bold;'>{st.session_state.selected_category}</span></p>
+        <p>مرحباً <span class='bara-player'>{current_player}</span></p>
+        <p>دورك هو: <span style='color: #e74c3c; font-weight: bold;'>{role}</span></p>
+    """, unsafe_allow_html=True)
+    
     if role == 'داخل السالفة':
-        st.write(f"الكلمة السرية هي: **{st.session_state.game_word}**")
+        st.markdown(f"""
+        <p>الكلمة السرية هي: <span class='secret-word'>{st.session_state.game_word}</span></p>
+        """, unsafe_allow_html=True)
     else:
-        st.write("مهمتك أن توضح للمجموعة أنك تعرف الموضوع بالإجابة بشكل عام.")
-    if st.session_state.current_player_index < len(st.session_state.players) - 1:
-        st.button("التالي", on_click=lambda: (st.session_state.update({'current_player_index': st.session_state.current_player_index + 1}), set_page('show_role')), key='show_role_button')
-    else:
-        st.button("التالي", on_click=set_page, args=['question_or_vote'], key='question_or_vote_button')
+        st.markdown("""
+        <p style='color: #e67e22; font-weight: bold;'>مهمتك أن توضح للمجموعة أنك تعرف الموضوع بالإجابة بشكل عام.</p>
+        """, unsafe_allow_html=True)
+    
+    st.markdown("</div>", unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1,2,1])
+    with col2:
+        if st.session_state.current_player_index < len(st.session_state.players) - 1:
+            st.button("👉 التالي", on_click=lambda: (st.session_state.update({'current_player_index': st.session_state.current_player_index + 1}), set_page('show_role')))
+        else:
+            st.button("🎮 بدء اللعب", on_click=set_page, args=['question_or_vote'])
 
 def question_or_vote_page():
-    st.title("ماذا تريد أن تفعل الآن؟ يجب على اللاعبين الآن أن يطرحوا أسئلة اولا و من ثم التصويت او اختيار جولة اسئلة جديدة.")
-    st.button("بدء جولة أسئلة جديدة", on_click=lambda: (st.session_state.update({'question_pairs': generate_question_pairs(st.session_state.players), 'current_pair_index': 0}), set_page('question_time')), key='question_time_button')
-    st.button("خلصنا اسئلة، البدء بالتصويت", on_click=set_page, args=['voting'], key='voting_button')
-    st.title("اذا لم تعجبك الكلمة، اضغط الزر الاسفل لاعادة الادوار واختيار كلمة جديدة من القائمات")
-    st.button("اختيار كلمة جديدة و اعادة الادوار", on_click=lambda: (reset_for_new_round(), set_page('select_category')), key='new_round_button')
+    st.markdown("<h1>🤔 ماذا تريد أن تفعل الآن؟</h1>", unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="card">
+        <p style='text-align: center;'>
+            يجب على اللاعبين الآن أن يطرحوا أسئلة أولاً ثم التصويت أو اختيار جولة أسئلة جديدة
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.button("❓ بدء جولة أسئلة جديدة", on_click=lambda: (st.session_state.update({'question_pairs': generate_question_pairs(st.session_state.players), 'current_pair_index': 0}), set_page('question_time')))
+    with col2:
+        st.button("🗳️ خلصنا أسئلة، البدء بالتصويت", on_click=set_page, args=['voting'])
+    
+    st.markdown("""
+    <div class="card" style='margin-top: 20px;'>
+        <p style='text-align: center; color: #e74c3c;'>
+            إذا لم تعجبك الكلمة، اضغط الزر أدناه لإعادة الأدوار واختيار كلمة جديدة
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1,2,1])
+    with col2:
+        st.button("🔄 اختيار كلمة جديدة وإعادة الأدوار", on_click=lambda: (reset_for_new_round(), set_page('select_category')))
 
 def question_time_page():
-    st.title("وقت الأسئلة")
+    st.markdown("<h1>❓ وقت الأسئلة</h1>", unsafe_allow_html=True)
     
-    # Check if there are pairs to display
     if st.session_state.current_pair_index < len(st.session_state.question_pairs):
         current_pair = st.session_state.question_pairs[st.session_state.current_pair_index]
-        st.write(f"{current_pair[0]} قم بسؤال {current_pair[1]}")
-        st.button(
-            "التالي", 
-            on_click=lambda: (
-                st.session_state.update({'current_pair_index': st.session_state.current_pair_index + 1}), 
+        
+        st.markdown(f"""
+        <div class="card">
+            <p style='text-align: center; font-size: 20px;'>
+                🎮 <span class='bara-player'>{current_pair[0]}</span> 
+                يسأل 
+                <span class='bara-player'>{current_pair[1]}</span>
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns([1,2,1])
+        with col2:
+            st.button("👉 السؤال التالي", on_click=lambda: (
+                st.session_state.update({'current_pair_index': st.session_state.current_pair_index + 1}),
                 set_page('question_time') if st.session_state.current_pair_index < len(st.session_state.question_pairs) else set_page('question_or_vote')
-            ), 
-            key='question_or_vote_button'
-        )
+            ))
     else:
-        st.button("الانتقال إلى التصويت", on_click=set_page, args=['voting'], key='voting_button')
-
+        col1, col2, col3 = st.columns([1,2,1])
+        with col2:
+            st.button("🗳️ الانتقال إلى التصويت", on_click=set_page, args=['voting'])
 
 def voting_page():
-    st.title("التصويت")
+    st.markdown("<h1>🗳️ التصويت</h1>", unsafe_allow_html=True)
     current_player = st.session_state.players[st.session_state.vote_index]
-    st.write(f"اللاعب **{current_player}** يصوت الآن.")
-
-    for player in st.session_state.players:
+    
+    st.markdown(f"""
+    <div class="card">
+        <p style='text-align: center; font-size: 20px;'>
+            اللاعب <span class='bara-player'>{current_player}</span> يصوت الآن
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    for i, player in enumerate(st.session_state.players):
         if player != current_player:
-            st.button(f"تصويت ضد {player}", on_click=lambda p=player: (st.session_state.votes.update({current_player: p}), st.session_state.update({'vote_index': st.session_state.vote_index + 1}) if st.session_state.vote_index < len(st.session_state.players) - 1 else set_page('voting_results')), key=player)
+            with col1 if i % 2 == 0 else col2:
+                st.button(f"🎯 تصويت ضد {player}", on_click=lambda p=player: (
+                    st.session_state.votes.update({current_player: p}),
+                    st.session_state.update({'vote_index': st.session_state.vote_index + 1})
+                    if st.session_state.vote_index < len(st.session_state.players) - 1
+                    else set_page('voting_results')
+                ))
 
 def voting_results_page():
-    st.title("نتائج التصويت")
+    st.markdown("<h1>📊 نتائج التصويت</h1>", unsafe_allow_html=True)
     bara_al_salfa = st.session_state.bara_al_salfa
-
-    # Display the results but not in table format 
+    
+    st.markdown("""
+    <div class="card">
+        <h3 style='text-align: center; color: #3498db;'>تفاصيل التصويت</h3>
+    """, unsafe_allow_html=True)
+    
     for player, voted_for in st.session_state.votes.items():
-        st.write(f"- {player} صوت ضد {voted_for}")
-
-    st.write(f"برا السالفة هو **{bara_al_salfa}**")
+        st.markdown(f"""
+        <p>🎯 <span class='bara-player'>{player}</span> صوت ضد <span class='bara-player'>{voted_for}</span></p>
+        """, unsafe_allow_html=True)
+    
+    st.markdown(f"""
+        <p style='margin-top: 20px; text-align: center; font-size: 24px;'>
+            برا السالفة هو <span class='bara-player'>{bara_al_salfa}</span>
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Initialize round_scores for all players
     for player in st.session_state.players:
         if player not in st.session_state.round_scores:
             st.session_state.round_scores[player] = 0
     
+    st.markdown("""
+    <div class="card" style='margin-top: 20px;'>
+        <h3 style='text-align: center; color: #2ecc71;'>النقاط المكتسبة</h3>
+    """, unsafe_allow_html=True)
+    
     for player, voted_for in st.session_state.votes.items():
         if voted_for == bara_al_salfa:
             st.session_state.round_scores[player] += 5
-            st.write(f"{player} حصل على 5 نقاط لتصويته الصحيح")
+            st.markdown(f"""
+            <p>🎉 <span class='bara-player'>{player}</span> حصل على <span class='score'>5</span> نقاط لتصويته الصحيح</p>
+            """, unsafe_allow_html=True)
     
-    st.write(f"الأن **{bara_al_salfa}** سيقوم بتخمين الكلمة السرية وامكانية الحصول على 10 نقاط.")
+    st.markdown("""</div>""", unsafe_allow_html=True)
     
-    st.button("التالي", on_click=set_page, args=['bara_guess'], key='bara_guess_button')
+    st.markdown(f"""
+    <div class="card" style='margin-top: 20px;'>
+        <p style='text-align: center; font-size: 20px;'>
+            الآن <span class='bara-player'>{bara_al_salfa}</span> سيقوم بتخمين الكلمة السرية للحصول على <span class='score'>10</span> نقاط إضافية
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1,2,1])
+    with col2:
+        st.button("🎯 تخمين الكلمة", on_click=set_page, args=['bara_guess'])
 
 def bara_guess_page():
-    st.title("تخمين الكلمة السرية")
-    st.write(f"الآن، دور **{st.session_state.bara_al_salfa}** لتخمين الكلمة السرية.")
+    st.markdown("<h1>🎯 تخمين الكلمة السرية</h1>", unsafe_allow_html=True)
+    
+    st.markdown(f"""
+    <div class="card">
+        <p style='text-align: center; font-size: 20px;'>
+            الآن، دور <span class='bara-player'>{st.session_state.bara_al_salfa}</span> لتخمين الكلمة السرية
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
     generate_guess_options()
     
-    for word in st.session_state.guess_word_options:
-        st.button(word, on_click=lambda w=word: handle_bara_guess(w), key=word)
+    col1, col2 = st.columns(2)
+    for i, word in enumerate(st.session_state.guess_word_options):
+        with col1 if i % 2 == 0 else col2:
+            st.button(f"🎯 {word}", on_click=lambda w=word: handle_bara_guess(w))
 
 def total_scores_page():
-    st.title("الكلمة السرية و النقاط الكلية")
+    st.markdown("<h1>🏆 النتائج النهائية</h1>", unsafe_allow_html=True)
     
-    # Display the result of the "برة السالفة" player's guess
-    st.write(st.session_state.guess_result)  # This should already be set by the handle_bara_guess function
-    st.write(f"الكلمة السرية كانت: **{st.session_state.game_word}**")
+    st.markdown(f"""
+    <div class="card">
+        <p style='text-align: center; font-size: 24px;'>{st.session_state.guess_result}</p>
+        <p style='text-align: center; margin-top: 10px;'>
+            الكلمة السرية كانت: <span class='secret-word'>{st.session_state.game_word}</span>
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Display round scores
-    st.write("**النقاط الكلية للجولة الحالية:**")
+    st.markdown("""
+    <div class="card" style='margin-top: 20px;'>
+        <h3 style='text-align: center; color: #3498db;'>نقاط الجولة الحالية</h3>
+    """, unsafe_allow_html=True)
+    
     for player, score in st.session_state.round_scores.items():
         if player.strip():
-            st.write(f"- {player}: {score} نقطة")
+            st.markdown(f"""
+            <p>🎮 <span class='bara-player'>{player}</span>: <span class='score'>{score}</span> نقطة</p>
+            """, unsafe_allow_html=True)
             if player in st.session_state.global_scores:
                 st.session_state.global_scores[player] += score
             else:
                 st.session_state.global_scores[player] = score
     
-    # Display total scores for all rounds
-    st.write("**النقاط الكلية لجميع الجولات:**")
-    for player, score in st.session_state.global_scores.items():
-        if player.strip():
-            st.write(f"- {player}: {score} نقطة")
+    st.markdown("""</div>""", unsafe_allow_html=True)
     
-    # Provide options to start a new round or quit the game
-    st.button("لعب جولة أخرى واختيار نفس القائمة او قائمة جديدة", on_click=lambda: (reset_for_new_round(), set_page('select_category')), key='new_round_button')
-    st.button("الخروج", on_click=lambda: st.stop(), key='quit_button')
-
+    st.markdown("""
+    <div class="card" style='margin-top: 20px;'>
+        <h3 style='text-align: center; color: #2ecc71;'>النقاط الإجمالية</h3>
+    """, unsafe_allow_html=True)
+    
+    # Sort players by score
+    sorted_players = sorted(st.session_state.global_scores.items(), key=lambda x: x[1], reverse=True)
+    
+    for player, score in sorted_players:
+        if player.strip():
+            st.markdown(f"""
+            <p>👑 <span class='bara-player'>{player}</span>: <span class='score'>{score}</span> نقطة</p>
+            """, unsafe_allow_html=True)
+    
+    st.markdown("""</div>""", unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.button("🔄 جولة جديدة", on_click=lambda: (reset_for_new_round(), set_page('select_category')))
+    with col2:
+        st.button("🚪 خروج", on_click=lambda: st.stop())
 
 # Page routing with callback functions
 def page_router():
